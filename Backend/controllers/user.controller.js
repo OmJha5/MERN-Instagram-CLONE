@@ -113,11 +113,6 @@ export const editProfile = async (req, res) => {
         const profilePhoto = req.file;
         let cloudResponse;
 
-        if (profilePhoto) {
-            const fileUri = getDataUri(profilePhoto);
-            cloudResponse = await cloudinary.uploader.upload(fileUri);
-        }
-
         const user = await User.findById(userId).select('-password');
         if (!user) {
             return res.status(404).json({
@@ -127,7 +122,7 @@ export const editProfile = async (req, res) => {
         };
         if (bio) user.bio = bio;
         if (gender) user.gender = gender;
-        if (profilePhoto) user.profilePhoto = cloudResponse.secure_url;
+        if (profilePhoto) user.profilePhoto = profilePhoto.path;
 
         await user.save();
 

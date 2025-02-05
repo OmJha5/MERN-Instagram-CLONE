@@ -13,12 +13,9 @@ export const addNewPost = async (req, res) => {
 
         if (!image) return res.status(400).json({ message: 'Image required' });
 
-        // buffer to data uri
-        const fileUri = getDataUri(image);
-        const cloudResponse = await cloudinary.uploader.upload(fileUri);
         const post = await Post.create({
             caption,
-            image: cloudResponse.secure_url,
+            image: image?.path,
             author: authorId
         });
         const user = await User.findById(authorId);

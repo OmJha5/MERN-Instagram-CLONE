@@ -5,6 +5,9 @@ import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
 import { readFileAsDataURL } from "@/lib/readFileAsDataURL";
 import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import axios from "axios";
+import { POST_API_ENDPOINT } from '../../endpoint.js'
 
 export default function CreatePost({ open, setOpen }) {
     let inputRef = useRef();
@@ -23,7 +26,31 @@ export default function CreatePost({ open, setOpen }) {
     }
 
     let onPostHandler = async() => {
-        console.log(file , caption)
+        try{
+            setLoading(true);
+            let formData = new FormData();
+            formData.append("caption" , caption);
+            if(imagePreview) formData.append("profilePhoto" , file);
+
+            const res = await axios.post(`${POST_API_ENDPOINT}/addpost` , formData , {
+                headers : {
+                    "Content-Type" : "multipart/form-data"
+                },
+                withCredentials : true
+            });
+
+            if(res.data.success){
+                toast.success(res.data.message);
+                setOpen(false)
+            }
+        }
+        catch(e){
+            console.log(e);
+            toast(e?.response?.data?.message)
+        }
+        finally{
+            setLoading(false)
+        }
     }
 
     return (

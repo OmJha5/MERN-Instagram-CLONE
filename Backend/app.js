@@ -23,8 +23,8 @@ app.use(cors(corsOptions))
 
 // API's
 app.use("/api/v1/user" , userRouter)
-app.use("/api/v1/user" , postRouter)
-app.use("/api/v1/user" , messageRouter)
+app.use("/api/v1/post" , postRouter)
+app.use("/api/v1/message" , messageRouter)
 
 app.listen(port , () => {
     connectDB()
