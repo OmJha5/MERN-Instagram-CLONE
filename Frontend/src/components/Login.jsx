@@ -7,6 +7,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import { USER_API_ENDPOINT } from '../../endpoint.js'
 import { toast } from 'sonner'
 import axios from 'axios'
+import { useDispatch } from 'react-redux'
+import { setAuthUser } from '@/redux/authSlice'
 
 export default function Signup() {
   let [loading , setLoading] = useState(false)
@@ -16,6 +18,7 @@ export default function Signup() {
 
   })
   let navigate = useNavigate();
+  let dipatch = useDispatch();
 
   let changeHandler = (e) => {
       setInput({...input , [e.target.name] : e.target.value});
@@ -35,6 +38,7 @@ export default function Signup() {
           })
 
           if(res.data.success){
+            dipatch(setAuthUser(res.data.user));
               navigate("/")
               toast.success(res.data.message);
               setInput({
