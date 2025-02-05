@@ -36,7 +36,7 @@ export default function Post() {
 
     return (
         <div className='flex flex-col my-8 w-fit'>
-            <div className="flex items-center justify-between w-full my-2">
+            <div className="flex items-center justify-between my-2">
                 <div className='flex gap-2'>
                     <Avatar className='w-6 h-6'>
                         <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
@@ -83,7 +83,7 @@ export default function Post() {
             <CommentDialog isOpen={isOpen} setIsOpen={setIsOpen} />
 
             <div className=" relative my-3">
-                <input value={isCommentText} onChange={checkShowPostOrNot} type="text" className="full p-2 outline-none" placeholder="Add a comment.."  />
+                <input value={isCommentText} onChange={checkShowPostOrNot} type="text" className="w-full pr-[70px] p-2 outline-none" placeholder="Add a comment.."  />
                 {
                     (isTypingText) ? (
                         <Button variant="ghost" className="text-blue-600 absolute right-0 h-[90%]" >Post</Button>
