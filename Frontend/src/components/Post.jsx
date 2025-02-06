@@ -1,24 +1,23 @@
 import React, { useState } from 'react'
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import {FaHeart , FaRegHeart} from "react-icons/fa";
+import {FaRegHeart} from "react-icons/fa";
 
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { Bookmark, MessageCircle, MoreHorizontal, Send } from 'lucide-react'
 import { Button } from './ui/button'
 import { Input } from './ui/input';
 import CommentDialog from './CommentDialog';
+import { useSelector } from 'react-redux';
 
-export default function Post() {
+export default function Post({post}) {
     let [isCommentText , setCommentText] = useState("");
     let [isTypingText , setIsTypingText] = useState(false);
     let [isOpen , setIsOpen] = useState(false);
+    let {user} = useSelector((state) => state.auth)
 
     let checkShowPostOrNot = (e) => {
         let s = e.target.value;
@@ -35,14 +34,14 @@ export default function Post() {
     }
 
     return (
-        <div className='flex flex-col my-8 w-fit'>
+        <div className='flex flex-col my-8 w-1/3'>
             <div className="flex items-center justify-between my-2">
                 <div className='flex gap-2'>
                     <Avatar className='w-6 h-6'>
-                        <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+                        <AvatarImage src={post.author.profilePhoto} alt="@shadcn" />
                         <AvatarFallback>CN</AvatarFallback>
                     </Avatar>
-                    <span className="font-bold">Username</span>
+                    <span className="font-bold">{post.author.username}</span>
                 </div>
                 <div>
                     <Dialog>
@@ -51,7 +50,9 @@ export default function Post() {
                             <div>
                                 <Button variant="outline" className="text-red-500 w-full">Unfollow</Button>
                                 <Button variant="outline" className="w-full">All To Favourites</Button>
-                                <Button variant="outline" className="text-red-500 w-full">Delete</Button>
+                                {
+                                    post?.author?._id.toString() == user?._id.toString() &&  <Button variant="outline" className="text-red-500 w-full">Delete</Button>
+                                }
                             </div>
                         </DialogContent>
                     </Dialog>
@@ -59,7 +60,7 @@ export default function Post() {
             </div>
 
             <div>
-                <img src="https://images.unsplash.com/photo-1738471743329-b50393cf6319?q=80&w=2001&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" className="w-[25vw] rounded-md aspect-square object-fit" alt="" />
+                <img src={post.image}  alt="" className='w-full' />
             </div>
 
             <div className='flex my-2 justify-between items-center '>
@@ -72,18 +73,18 @@ export default function Post() {
             </div>
 
             <div>
-                <span className='font-medium block text-sm'>1k likes</span>
+                <span className='font-medium block text-sm'>{post.likes.length} likes</span>
                 <div className='flex flex-col my-2'>
-                    <span className='font-bold text-sm'>Username</span>
-                    <span className='font-normal text-sm'>Caption</span>
+                    <span className='font-bold text-sm'>{post.author.username}</span>
+                    <span>{post.caption}</span>
                 </div>
-                <span className="font-normal block text-sm text-gray-500 cursor-pointer" onClick={() => setIsOpen(true)}>View all 10 comments</span>
+                <span className="font-normal block text-sm text-gray-500 cursor-pointer" onClick={() => setIsOpen(true)}>View all {post.comments.length} comments</span>
             </div>
 
             <CommentDialog isOpen={isOpen} setIsOpen={setIsOpen} />
 
             <div className=" relative my-3">
-                <input value={isCommentText} onChange={checkShowPostOrNot} type="text" className="w-full pr-[70px] p-2 outline-none" placeholder="Add a comment.."  />
+                <input value={isCommentText} onChange={checkShowPostOrNot} type="text" className="w-full pr-[70px] p-2 outline-none border border-[#f0ecec] rounded-md" placeholder="Add a comment.."  />
                 {
                     (isTypingText) ? (
                         <Button variant="ghost" className="text-blue-600 absolute right-0 h-[90%]" >Post</Button>

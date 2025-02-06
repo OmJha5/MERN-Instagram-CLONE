@@ -8,6 +8,8 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
 import { POST_API_ENDPOINT } from '../../endpoint.js'
+import { setAllPosts } from "@/redux/postSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function CreatePost({ open, setOpen }) {
     let inputRef = useRef();
@@ -15,6 +17,9 @@ export default function CreatePost({ open, setOpen }) {
     let [caption , setCaption] = useState("");
     let [imagePreview , setImagePreview] = useState("");
     let [loading , setLoading] = useState(false);
+    let {allPosts} = useSelector((state) => state.post);
+    let dispatch = useDispatch();
+    let {user} = useSelector((state) => state.auth);
 
     let fileChangeHandler = async (e) => {
         const file = e.target.files?.[0];
@@ -42,6 +47,10 @@ export default function CreatePost({ open, setOpen }) {
             if(res.data.success){
                 toast.success(res.data.message);
                 setOpen(false)
+                dispatch(setAllPosts([res.data.post , ...allPosts]));
+                setFile("")
+                setImagePreview("");
+                setCaption("");
             }
         }
         catch(e){
@@ -62,13 +71,13 @@ export default function CreatePost({ open, setOpen }) {
                     </DialogHeader>
                     <div className="flex gap-3 items center">
                         <Avatar className='w-6 h-6 self-center'>
-                            <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+                            <AvatarImage src={user?.profilePhoto} alt="@shadcn" />
                             <AvatarFallback>CN</AvatarFallback>
                         </Avatar>
 
                         <div>
-                            <h1 className="font-semibold text-xs">Username</h1>
-                            <span className="text-gray-600 text-sx">Bio here..</span>
+                            <h1 className="font-semibold text-xs">{user?.username}</h1>
+                            <span className="text-gray-600 text-sx">{user?.bio}</span>
                         </div>
                     </div>
 

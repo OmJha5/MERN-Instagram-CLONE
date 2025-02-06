@@ -1,8 +1,11 @@
 import React from 'react'
 import LeftSidebar from './LeftSidebar'
 import Posts from './Posts'
+import useGetAllPost from '@/hooks/useGetAllPosts';
 
 export default function Home() {
+  useGetAllPost();
+
   return (
     <div>
         <LeftSidebar/>

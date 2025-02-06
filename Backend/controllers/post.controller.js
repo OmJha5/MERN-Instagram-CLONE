@@ -1,8 +1,6 @@
-import {cloudinary} from "../utils/cloudConfig.js";
 import { Post } from "../models/post.model.js";
 import { User } from "../models/user.model.js";
 import { Comment } from "../models/comment.model.js";
-import getDataUri from "../utils/datauri.js";
 
 
 export const addNewPost = async (req, res) => {
@@ -49,6 +47,7 @@ export const getAllPost = async (req, res) => {
                     select: 'username profilePhoto'
                 }
             });
+
         return res.status(200).json({
             posts,
             success: true
