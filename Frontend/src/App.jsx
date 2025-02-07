@@ -3,6 +3,7 @@ import Signup from './components/Signup'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Home from './components/Home'
 import Login from './components/Login'
+import Profile from './components/Profile'
 
 let appRouter = createBrowserRouter([
     {
@@ -16,6 +17,10 @@ let appRouter = createBrowserRouter([
     {
         path : "/login",
         element : <Login/>
+    },
+    {
+        path : "/:id/profile",
+        element : <Profile/>
     }
 ])
 
