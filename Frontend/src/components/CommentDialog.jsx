@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
     Dialog,
     DialogContent,
@@ -9,34 +9,81 @@ import { MoreHorizontal } from 'lucide-react'
 import { Button } from './ui/button'
 import { DialogTrigger } from '@radix-ui/react-dialog'
 import { Input } from './ui/input'
+import { useDispatch, useSelector } from 'react-redux'
+import Comment from './Comment'
+import { POST_API_ENDPOINT } from '../../endpoint.js'
+import { setAllPosts } from '@/redux/postSlice'
+import { toast } from 'sonner'
+import axios from 'axios'
 
 export default function CommentDialog({ isOpen, setIsOpen }) {
+    let dispatch = useDispatch();
+    let { selectedPost , allPosts } = useSelector((state) => state.post);
+    let {user} = useSelector((state) => state.auth)
+    let [isCommentText , setCommentText] = useState("");
+    let [allComments , setAllComments] = useState([]);
+
+    useEffect(() => {
+        setAllComments(selectedPost?.comments)
+    } , [selectedPost])
+
+    let commentPostHandler = async() => {
+        try{
+            let res = await axios.post(`${POST_API_ENDPOINT}/${selectedPost._id}/comment` , {text : isCommentText} , {
+                headers : {
+                    "Content-Type" : "application/json"
+                },
+                withCredentials : true
+            })
+
+            if(res.data.success){
+                let updatedAllComments = [res.data.comment , ...allComments];
+                setAllComments(updatedAllComments);
+
+                let updatedAllPosts = allPosts?.map((p) => 
+                    (p._id == selectedPost._id) ? {
+                        ...p,
+                        comments : updatedAllComments
+                    } : p
+                )
+
+                dispatch(setAllPosts(updatedAllPosts));
+                setCommentText("");
+            }
+        }
+        catch(e){
+            toast.error(e?.response?.data?.message);
+        }
+    }
+
     return (
         <div>
             <Dialog open={isOpen}>
                 <DialogContent onInteractOutside={() => setIsOpen(false)} className="max-w-5xl p-0">
                     <div className="flex gap-10">
-                        <div>
-                            <img src="https://images.unsplash.com/photo-1738471743329-b50393cf6319?q=80&w=2001&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" className="w-[30vw] rounded-tl-md rounded-bl-md aspect-square object-fit" alt="" />
+                        <div className='w-[60%]'>
+                            <img src={selectedPost?.image} className='w-full h-full object-cover object-left-top' alt="" />
                         </div>
 
-                        <div className="flex-1 mr-7">
-                            <div className="flex items-center justify-between my-2">
+                        <div className="flex-1 mr-7 flex flex-col justify-evenly ">
+                            <div className="flex items-center justify-between h-[10%]">
                                 <div className='flex gap-2'>
                                     <Avatar className='w-6 h-6'>
-                                        <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+                                        <AvatarImage src={selectedPost?.author?.profilePhoto} alt="@shadcn" />
                                         <AvatarFallback>CN</AvatarFallback>
                                     </Avatar>
-                                    <span className="font-bold">Username</span>
+                                    <span className="font-bold">{selectedPost?.author?.username}</span>
                                 </div>
                                 <div>
                                     <Dialog>
-                                        <DialogTrigger> <MoreHorizontal/> </DialogTrigger>
+                                        <DialogTrigger> <MoreHorizontal /> </DialogTrigger>
                                         <DialogContent>
                                             <div>
                                                 <Button variant="outline" className="text-red-500 w-full">Unfollow</Button>
                                                 <Button variant="outline" className="w-full">All To Favourites</Button>
-                                                <Button variant="outline" className="text-red-500 w-full">Delete</Button>
+                                                {
+                                                    selectedPost?.author?._id.toString() == user?._id.toString() && <Button variant="outline" className="text-red-500 w-full">Delete</Button>
+                                                }
                                             </div>
                                         </DialogContent>
                                     </Dialog>
@@ -45,13 +92,15 @@ export default function CommentDialog({ isOpen, setIsOpen }) {
 
                             <hr />
 
-                            <div className="flex flex-col gap-5 h-96 overflow-y-auto my-5">
-                                Here Comments will come.
+                            <div className="flex flex-col gap-5 overflow-y-auto h-[70%]">
+                                {
+                                    allComments?.map((comment) => <Comment key={comment?._id} comment={comment} />)
+                                }
                             </div>
 
                             <div className="flex gap-3">
-                                <Input placeholder="Post a Comment" />
-                                <Button variant="ghost" >Post</Button>
+                                <Input placeholder="Post a Comment" className="text-sm" onChange={(e) => setCommentText(e.target.value)} />
+                                <Button variant="ghost" onClick={commentPostHandler} >Post</Button>
                             </div>
                         </div>
                     </div>

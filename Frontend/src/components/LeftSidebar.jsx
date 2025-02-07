@@ -8,6 +8,7 @@ import axios from 'axios'
 import { useDispatch } from 'react-redux'
 import { setAuthUser } from '@/redux/authSlice.js'
 import CreatePost from './CreatePost.jsx'
+import { setAllPosts, setSelectedPost } from '@/redux/postSlice.js'
 
 const sidebarItems = [
   { icon: <Home />, text: "Home" },
@@ -40,6 +41,8 @@ export default function LeftSidebar() {
       if (res.data.success) {
         navigate("/login");
         dispatch(setAuthUser(null));
+        dispatch(setAllPosts([]));
+        dispatch(setSelectedPost(null));
         toast.success(res.data.message);
       }
     } catch (error) {

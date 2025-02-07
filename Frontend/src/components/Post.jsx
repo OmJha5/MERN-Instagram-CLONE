@@ -14,8 +14,9 @@ import CommentDialog from './CommentDialog';
 import { useDispatch, useSelector } from 'react-redux';
 import { POST_API_ENDPOINT } from '../../endpoint.js'
 import axios from 'axios';
-import { setAllPosts } from '@/redux/postSlice';
+import { setAllPosts, setSelectedPost } from '@/redux/postSlice';
 import { toast } from 'sonner';
+import { Badge } from "@/components/ui/badge"
 
 export default function Post({post}) {
     let [isCommentText , setCommentText] = useState("");
@@ -119,6 +120,7 @@ export default function Post({post}) {
                         <AvatarFallback>CN</AvatarFallback>
                     </Avatar>
                     <span className="font-bold">{post.author.username}</span>
+                    { user._id == post.author._id && <Badge variant="secondary" className="cursor-pointer">Author</Badge> }
                 </div>
                 <div>
                     <Dialog>
@@ -146,7 +148,10 @@ export default function Post({post}) {
                     {
                         isLiked ? <FaHeart size={"23px"} className='cursor-pointer text-red-600 ' onClick={likeDislikeHandler} /> : <FaRegHeart size={"23px"} className='cursor-pointer hover:text-gray-600 ' onClick={likeDislikeHandler} />
                     }
-                    <MessageCircle className='cursor-pointer mx-2 hover:text-gray-600' onClick={() => setIsOpen(true)}/>
+                    <MessageCircle className='cursor-pointer mx-2 hover:text-gray-600' onClick={() => {
+                        setIsOpen(true)
+                        dispatch(setSelectedPost(post))
+                    }}/>
                     <Send className='cursor-pointer hover:text-gray-600 '/>
                 </div>
                 <Bookmark className='cursor-pointer hover:text-gray-600 '/>
@@ -158,13 +163,21 @@ export default function Post({post}) {
                     <span className='font-bold text-sm'>{post.author.username}</span>
                     <span>{post.caption}</span>
                 </div>
-                <span className="font-normal block text-sm text-gray-500 cursor-pointer" onClick={() => setIsOpen(true)}>View all {post.comments.length} comments</span>
+                {
+                    allComments?.length > 0 && (
+                        <span className="font-normal block text-sm text-gray-500 cursor-pointer" onClick={() => {
+                            setIsOpen(true)
+                            dispatch(setSelectedPost(post))
+        
+                        }}>View all {post.comments.length} comments</span>
+                    )
+                }
             </div>
 
             <CommentDialog isOpen={isOpen} setIsOpen={setIsOpen} />
 
             <div className=" relative my-3">
-                <input value={isCommentText} onChange={checkShowPostOrNot} type="text" className="w-full pr-[70px] p-2 outline-none border border-[#f0ecec] rounded-md" placeholder="Add a comment.."  />
+                <input value={isCommentText} onChange={checkShowPostOrNot} type="text" className="w-full pr-[70px] text-sm p-2 outline-none border border-[#f0ecec] rounded-md" placeholder="Add a comment.."  />
                 {
                     (isTypingText) ? (
                         <Button variant="ghost" className="text-blue-600 absolute right-0 h-[90%] cursor-pointer" onClick={commentPostHandler} >Post</Button>
