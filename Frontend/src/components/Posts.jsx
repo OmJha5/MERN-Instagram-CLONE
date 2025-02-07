@@ -8,7 +8,7 @@ export default function Posts() {
     <div className='flex flex-col items-center'>
         {
             allPosts?.map((post) => {
-                return <Post key={post._id} post={post} />
+                return (post !== null) && <Post key={post?._id} post={post} />
             })
 
         }
