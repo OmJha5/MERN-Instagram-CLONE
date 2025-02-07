@@ -3,17 +3,17 @@ import { useDispatch, useSelector } from 'react-redux'
 import { USER_API_ENDPOINT } from '../../endpoint.js'
 import { toast } from 'sonner';
 import axios from "axios";
-import { setAllSuggestedUsers } from "@/redux/authSlice.js";
+import { setUserProfile } from "@/redux/authSlice.js";
 
-const useGetAllSuggestedUsers = () => {
+const useGetUserProfile = (userId) => {
     let dispatch = useDispatch();
 
     useEffect(() => {
-        const getAllSuggestedUsers = async() => {
+        const getUserProfile = async() => {
             try{
-                const res = await axios.get(`${USER_API_ENDPOINT}/suggested` , {withCredentials : true});
+                const res = await axios.get(`${USER_API_ENDPOINT}/${userId}/profile` , {withCredentials : true});
                 if(res.data.success){
-                    dispatch(setAllSuggestedUsers(res.data.users));
+                    dispatch(setUserProfile(res.data.user));
                 }
             }
             catch(e){
@@ -21,8 +21,8 @@ const useGetAllSuggestedUsers = () => {
             }
         }
 
-        getAllSuggestedUsers();
-    } , [])
+        getUserProfile();
+    } , [userId])
 }
 
-export default useGetAllSuggestedUsers;
+export default useGetUserProfile;
