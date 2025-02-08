@@ -53,6 +53,7 @@ export default function LeftSidebar() {
   let handleClick = (type) => {
     if (type == "Logout") handleLogOut();
     else if (type == "Create") setOpen(true);
+    else if(type == "Home") navigate("/");
   }
 
 
